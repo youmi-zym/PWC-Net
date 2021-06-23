@@ -3,13 +3,14 @@
 
 ## PWC-Net: CNNs for Optical Flow Using Pyramid, Warping, and Cost Volume
 
+We upgrade the [PWC-Net](https://github.com/NVlabs/PWC-Net) from **Pytorch==0.2.0** to **Pytorch>=1.7.1**.
+
 ### License
 Copyright (C) 2018 NVIDIA Corporation. All rights reserved. Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode).
 
 
 ### Usage
 
-For Caffe users, please refer to [Caffe/README.md](Caffe/README.md).
 
 For PyTorch users, please refer to [PyTorch/README.md](PyTorch/README.md)
 
@@ -76,6 +77,6 @@ For multi-frame flow, please also cite
 [Learning Rigidity in Dynamic Scenes with a Moving Camera for 3D Motion Field Estimation (ECCV 2018)](https://github.com/NVlabs/learningrigidity)
 
 ### Contact
-Deqing Sun (deqing.sun@gmail.com)
+Deqing Sun (deqing.sun@gmail.com), Youmin Zhang (youmin.zhang2@unibo.it)
 
 

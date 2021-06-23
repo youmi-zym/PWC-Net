@@ -7,16 +7,56 @@ Licensed under the CC BY-NC-SA 4.0 license (https://creativecommons.org/licenses
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torch.autograd import Variable
 import os
-os.environ['PYTHON_EGG_CACHE'] = 'tmp/' # a writable directory 
-from correlation_package.modules.corr import Correlation 
 import numpy as np
 import torch.nn.init as nn_init
+from spatial_correlation_sampler import SpatialCorrelationSampler
 
 __all__ = [
  'NetFusion'
 ]
+
+class Correlation(nn.Module):
+    def __init__(self, pad_size=None, kernel_size=None, max_displacement=None, stride1=None, stride2=None, corr_multiply=None):
+        super(Correlation, self).__init__()
+
+        self.pad_size = pad_size
+        self.kernel_size = kernel_size
+        self.max_displacement = max_displacement
+        self.stride1 = stride1
+        self.stride2 = stride2
+        self.corr_multiply = corr_multiply
+
+        stride = stride1
+        dilation = 1
+        dilation_patch = stride2
+        patch_size = (2 * max_displacement) // dilation_patch + 1
+        
+        self.correlation_sampler = SpatialCorrelationSampler(
+            kernel_size=kernel_size,
+            patch_size=patch_size,
+            stride=stride,
+            padding=pad_size,
+            dilation=dilation,
+            dilation_patch=dilation_patch
+        )
+
+    def forward(input1, input2):
+        return self.correlation_sampler(input1, inptu2)
+        
+
+Class ChannelNorm(nn.Module):
+    def __init__(self, norm_deg=2):
+        super(ChannelNorm, self).__init__()
+        self.norm_deg = norm_deg
+
+    def forward(self, input):
+        x = torch.pow(input, 2.0).sum(dim=1, keepdim=True)
+        x = torch.sqrt(x)
+
+        return x
 
 
 def deconv(in_planes, out_planes):
