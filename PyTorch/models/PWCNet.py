@@ -10,6 +10,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import os
 import numpy as np
+import ipdb
 
 from spatial_correlation_sampler import SpatialCorrelationSampler
 
@@ -37,13 +38,17 @@ class Correlation(nn.Module):
             kernel_size=kernel_size,
             patch_size=patch_size,
             stride=stride,
-            padding=pad_size,
+            padding=0,
             dilation=dilation,
             dilation_patch=dilation_patch
         )
 
-    def forward(input1, input2):
-        return self.correlation_sampler(input1, inptu2)
+    def forward(self, input1, input2):
+        cost = self.correlation_sampler(input1, input2)
+        B, ph, pw, H, W = cost.shape
+        cost = cost.reshape(B, ph*pw, H, W)
+
+        return cost
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):   
@@ -156,7 +161,7 @@ class PWCDCNet(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
-                nn.init.kaiming_normal(m.weight.data, mode='fan_in')
+                nn.init.kaiming_normal_(m.weight.data, mode='fan_in')
                 if m.bias is not None:
                     m.bias.data.zero_()
 
@@ -178,7 +183,7 @@ class PWCDCNet(nn.Module):
         grid = torch.cat((xx,yy),1).float()
 
         if x.is_cuda:
-            grid = grid.cuda()
+            grid = grid.to(x.device)
         vgrid = Variable(grid) + flo
 
         # scale grid to [-1,1] 
@@ -187,7 +192,7 @@ class PWCDCNet(nn.Module):
 
         vgrid = vgrid.permute(0,2,3,1)        
         output = nn.functional.grid_sample(x, vgrid)
-        mask = torch.autograd.Variable(torch.ones(x.size())).cuda()
+        mask = torch.autograd.Variable(torch.ones(x.size())).to(x.device)
         mask = nn.functional.grid_sample(mask, vgrid)
 
         # if W==128:
@@ -220,7 +225,6 @@ class PWCDCNet(nn.Module):
 
         corr6 = self.corr(c16, c26) 
         corr6 = self.leakyRELU(corr6)   
-
 
         x = torch.cat((self.conv6_0(corr6), corr6),1)
         x = torch.cat((self.conv6_1(x), x),1)

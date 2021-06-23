@@ -73,13 +73,13 @@ for _i, _inputs in enumerate(im_all):
     
 # compute two frame flows
 input_01 = [im_all[0].cuda(), im_all[1].cuda()]
-input_01_var = torch.autograd.Variable(torch.cat(input_01,1), volatile=True)
+input_01 = torch.cat(input_01, dim=1).cuda()
 
 input_12 = [im_all[1].cuda(), im_all[2].cuda()]
-input_12_var = torch.autograd.Variable(torch.cat(input_12,1), volatile=True)
+input_12 = torch.cat(input_12, dim=1).cuda()
 
 input_10 = [im_all[1].cuda(), im_all[0].cuda()]
-input_10_var = torch.autograd.Variable(torch.cat(input_10,1), volatile=True)
+input_10 = torch.cat(input_10, dim=1).cuda()
 
 
 net = models.pwc_dc_net(pwc_model_fn)

@@ -4,7 +4,7 @@ import torch
 import numpy as np
 from math import ceil
 from torch.autograd import Variable
-from scipy.ndimage import imread
+from skimage.io import imread
 import models
 """
 Contact: Deqing Sun (deqings@nvidia.com); Zhile Ren (jrenzhile@gmail.com)
@@ -61,9 +61,9 @@ for _i, _inputs in enumerate(im_all):
 	im_all[_i] = torch.from_numpy(im_all[_i])
 	im_all[_i] = im_all[_i].expand(1, im_all[_i].size()[0], im_all[_i].size()[1], im_all[_i].size()[2])	
 	im_all[_i] = im_all[_i].float()
-    
-im_all = torch.autograd.Variable(torch.cat(im_all,1).cuda(), volatile=True)
 
+im_all = torch.cat(im_all, 1).cuda()
+    
 net = models.pwc_dc_net(pwc_model_fn)
 net = net.cuda()
 net.eval()

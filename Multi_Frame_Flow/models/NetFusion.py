@@ -38,13 +38,17 @@ class Correlation(nn.Module):
             kernel_size=kernel_size,
             patch_size=patch_size,
             stride=stride,
-            padding=pad_size,
+            padding=0,
             dilation=dilation,
             dilation_patch=dilation_patch
         )
 
-    def forward(input1, input2):
-        return self.correlation_sampler(input1, inptu2)
+    def forward(self, input1, input2):
+        cost = self.correlation_sampler(input1, input2)
+        B, ph, pw, H, W = cost.shape
+        cost = cost.reshape(B, ph*pw, H, W)
+
+        return cost
         
 
 Class ChannelNorm(nn.Module):
@@ -127,7 +131,7 @@ class NetFusion(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d) or isinstance(m, nn.ConvTranspose2d):
-                nn.init.kaiming_normal(m.weight.data, mode='fan_in')
+                nn.init.kaiming_normal_(m.weight.data, mode='fan_in')
                 if m.bias is not None:
                     m.bias.data.zero_()
         
